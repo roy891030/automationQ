@@ -18,13 +18,9 @@ HEADERS = {
     'Content-Type': 'application/json'
 }
 
-# 預設 alpha 表達式清單
-alpha_expressions = [
-    "rank(ts_delta(close, 5))",
-    "-ts_rank(volume, 10)",
-    "zscore(ts_min(low, 20))",
-    "log(divide(close, ts_mean(close, 5)))",
-]
+# 從檔案讀取 alpha 表達式清單
+with open('alpha_list.txt') as f:
+    alpha_expressions = [line.strip() for line in f if line.strip()]
 
 # 判斷條件
 def is_promising(result):
@@ -33,12 +29,13 @@ def is_promising(result):
         sharpe = is_data['sharpe']
         turnover = is_data['turnover']
         fitness = is_data['fitness']
-        logging.info(f"Sharpe: {sharpe}, Turnover: {turnover}, Fitness: {fitness}")
+        logging.info(f"Sharpe: {sharpe:.2f}, Turnover: {turnover:.2f}, Fitness: {fitness:.2f}")
 
         if sharpe > 1.25 and 0.01 < turnover < 0.7 and fitness > 1.0:
             return True
         return False
     except:
+        logging.warning("無法解析績效指標，略過")
         return False
 
 # 執行模擬與提交
@@ -86,8 +83,8 @@ for expr in alpha_expressions:
         alpha_id = result.get("alpha")
         if alpha_id:
             submit_resp = session.post(SUBMIT_URL.format(alpha_id))
-            logging.info(f"已提交 alpha_id={alpha_id}, status={submit_resp.status_code}")
+            logging.info(f"✅ 已提交 alpha_id={alpha_id}, status={submit_resp.status_code}")
         else:
-            logging.warning("未取得 alpha_id")
+            logging.warning("❗ 未取得 alpha_id")
     else:
-        logging.info("此 alpha 未通過條件")
+        logging.info("❌ 此 alpha 未通過條件")
