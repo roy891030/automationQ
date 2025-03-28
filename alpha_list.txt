@@ -1,4 +1,3 @@
 rank(ts_delta(close, 5))
 -ts_rank(volume, 10)
-zscore(ts_min(low, 20))
 log(divide(close, ts_mean(close, 5)))

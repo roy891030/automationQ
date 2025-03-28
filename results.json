@@ -1,0 +1,23 @@
+[
+  {
+    "sharpe": -1.32,
+    "turnover": 0.4004,
+    "fitness": -0.67,
+    "status": "fail",
+    "expression": "rank(ts_delta(close, 5))"
+  },
+  {
+    "sharpe": -0.14,
+    "turnover": 0.6291,
+    "fitness": -0.01,
+    "status": "fail",
+    "expression": "-ts_rank(volume, 10)"
+  },
+  {
+    "sharpe": -1.07,
+    "turnover": 0.507,
+    "fitness": -0.62,
+    "status": "fail",
+    "expression": "log(divide(close, ts_mean(close, 5)))"
+  }
+]

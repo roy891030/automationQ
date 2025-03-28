@@ -3,6 +3,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import time
 import logging
+import os
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -11,45 +12,74 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 with open('credentials.txt') as f:
     username, password = json.load(f)
 
-# 模擬設定
 SIMULATION_URL = 'https://api.worldquantbrain.com/simulations'
+ALPHAS_URL = f'https://api.worldquantbrain.com/users/YL98528/alphas'
+ALPHA_DETAIL_URL = 'https://api.worldquantbrain.com/alphas/{}'
 SUBMIT_URL = 'https://api.worldquantbrain.com/alphas/{}/submit'
-HEADERS = {
-    'Content-Type': 'application/json'
-}
 
 # 從檔案讀取 alpha 表達式清單
+if not os.path.exists('alpha_list.txt'):
+    with open('alpha_list.txt', 'w') as f:
+        f.write('rank(ts_delta(close, 5))\n')
+        f.write('-ts_rank(volume, 10)\n')
+        f.write('log(divide(close, ts_mean(close, 5)))\n')
+    logging.warning("alpha_list.txt 不存在，已自動建立範例檔案，請確認內容後重新執行。")
+    exit(0)
+
 with open('alpha_list.txt') as f:
     alpha_expressions = [line.strip() for line in f if line.strip()]
 
-# 判斷條件
-def is_promising(result):
-    try:
-        is_data = result['is']
-        sharpe = is_data['sharpe']
-        turnover = is_data['turnover']
-        fitness = is_data['fitness']
-        logging.info(f"Sharpe: {sharpe:.2f}, Turnover: {turnover:.2f}, Fitness: {fitness:.2f}")
+results_log = []
 
-        if sharpe > 1.25 and 0.01 < turnover < 0.7 and fitness > 1.0:
-            return True
-        return False
-    except:
-        logging.warning("無法解析績效指標，略過")
-        return False
+# 等待 alpha_id 出現
+def wait_for_alpha_id(session, expr, max_wait=60, check_interval=5):
+    waited = 0
+    while waited < max_wait:
+        resp = session.get(ALPHAS_URL)
+        if resp.status_code == 200:
+            alphas = resp.json().get("results", [])
+            for entry in alphas:
+                if entry.get("regular", {}).get("code") == expr:
+                    return entry.get("id")
+        time.sleep(check_interval)
+        waited += check_interval
+        logging.info(f"⏳ 等待 alpha_id 中... 已等候 {waited} 秒")
+    logging.warning("⌛ 超過等待時間，未取得 alpha_id")
+    results_log.append({"expression": expr, "status": "timeout"})
+    return None
 
-# 執行模擬與提交
+# 用 alpha_id 查詢最新績效
+def fetch_alpha_metrics(session, alpha_id):
+    detail_resp = session.get(ALPHA_DETAIL_URL.format(alpha_id))
+    if detail_resp.status_code == 200:
+        data = detail_resp.json()
+        is_data = data.get("is", {})
+        return {
+            "sharpe": is_data.get("sharpe"),
+            "turnover": is_data.get("turnover"),
+            "fitness": is_data.get("fitness"),
+            "status": "unknown"
+        }
+    else:
+        logging.warning(f"❗ 無法取得 alpha_id={alpha_id} 的績效資料")
+        return {
+            "sharpe": None,
+            "turnover": None,
+            "fitness": None,
+            "status": "detail_error"
+        }
+
+# 建立 session 並登入
 session = requests.Session()
 session.auth = HTTPBasicAuth(username, password)
-
-# 登入（一次）
 resp = session.post('https://api.worldquantbrain.com/authentication')
 if resp.status_code != 201:
     logging.error("登入失敗")
     exit(1)
 
+# 開始模擬流程
 for expr in alpha_expressions:
-    logging.info(f"模擬 alpha: {expr}")
+    logging.info(f"🚀 模擬 alpha: {expr}")
 
     payload = {
         'type': 'REGULAR',
@@ -65,26 +95,58 @@ for expr in alpha_expressions:
             'unitHandling': 'VERIFY',
             'nanHandling': 'OFF',
             'language': 'FASTEXPR',
-            'visualization': False
+            'visualization': False,
+            'testPeriod': 'P1Y'
         },
         'regular': expr
     }
 
-    r = session.post(SIMULATION_URL, json=payload)
-    if r.status_code != 201:
-        logging.warning(f"模擬失敗: {r.text}")
+    try:
+        r = session.post(SIMULATION_URL, json=payload)
+        r.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logging.warning(f"模擬建立失敗: {e}")
+        results_log.append({
+            "expression": expr,
+            "status": "simulation_error",
+            "error_message": str(e),
+            "details": r.text if 'r' in locals() else "no response"
+        })
         continue
 
-    sim_url = r.headers.get('location')
-    time.sleep(10)  # 等待模擬完成
-    result = session.get(sim_url).json()
+    logging.info("⌛ 開始等待 alpha_id 出現...")
+    alpha_id = wait_for_alpha_id(session, expr)
+    if not alpha_id:
+        continue
 
-    if result.get("status") == "COMPLETE" and is_promising(result):
-        alpha_id = result.get("alpha")
-        if alpha_id:
+    # 查詢詳細績效
+    metrics = fetch_alpha_metrics(session, alpha_id)
+    sharpe = metrics["sharpe"]
+    turnover = metrics["turnover"]
+    fitness = metrics["fitness"]
+
+    if sharpe is not None and turnover is not None and fitness is not None:
+        logging.info(f"📊 Sharpe: {sharpe:.2f}, Turnover: {turnover:.2f}, Fitness: {fitness:.2f}")
+        metrics["expression"] = expr
+        if sharpe > 1.25 and 0.01 < turnover < 0.7 and fitness > 1.0:
+            logging.info("✅ 此 alpha 通過條件，將提交")
+            metrics["status"] = "pass"
             submit_resp = session.post(SUBMIT_URL.format(alpha_id))
-            logging.info(f"✅ 已提交 alpha_id={alpha_id}, status={submit_resp.status_code}")
+            if submit_resp.status_code == 200:
+                logging.info(f"📩 已成功提交 alpha_id={alpha_id}")
+            else:
+                logging.warning(f"❗ 提交失敗：{submit_resp.status_code}")
         else:
-            logging.warning("❗ 未取得 alpha_id")
+            metrics["status"] = "fail"
+            logging.info("❌ 此 alpha 未通過條件")
     else:
-        logging.info("❌ 此 alpha 未通過條件")
+        logging.warning("⚠️ 無法取得完整績效資料")
+        metrics["expression"] = expr
+        metrics["status"] = "no_data"
+
+    results_log.append(metrics)
+
+# 儲存所有模擬結果
+with open("results.json", "w") as f:
+    json.dump(results_log, f, indent=2, ensure_ascii=False)
+logging.info("✅ 所有模擬結果已寫入 results.json")
