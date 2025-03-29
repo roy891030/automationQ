@@ -29,17 +29,9 @@ if not os.path.exists('alpha_list.txt'):
 with open('alpha_list.txt') as f:
     alpha_expressions = [line.strip() for line in f if line.strip()]
 
-# 載入舊的 results.json（如果有的話）
-if os.path.exists("results.json"):
-    with open("results.json", "r") as f:
-        try:
-            results_log = json.load(f)
-        except json.JSONDecodeError:
-            results_log = []
-else:
-    results_log = []
+results_log = []
 
-# 等待 alpha_id 出現，若系統標記為錯誤就提早跳過
+# 等待 alpha_id 出現（包含錯誤判斷）
 def wait_for_alpha_id(session, expr, max_wait=60, check_interval=5):
     waited = 0
     while waited < max_wait:
@@ -63,19 +55,25 @@ def wait_for_alpha_id(session, expr, max_wait=60, check_interval=5):
     results_log.append({"expression": expr, "status": "timeout"})
     return None
 
-
-# 用 alpha_id 查詢最新績效
+# 查詢詳細績效（移除年度表現）
 def fetch_alpha_metrics(session, alpha_id):
     detail_resp = session.get(ALPHA_DETAIL_URL.format(alpha_id))
     if detail_resp.status_code == 200:
         data = detail_resp.json()
         is_data = data.get("is", {})
-        return {
+
+        metrics = {
             "sharpe": is_data.get("sharpe"),
             "turnover": is_data.get("turnover"),
             "fitness": is_data.get("fitness"),
+            "returns": is_data.get("returns"),
+            "drawdown": is_data.get("drawdown"),
+            "margin": is_data.get("margin"),
+            "alpha_id": alpha_id,
             "status": "unknown"
         }
+
+        return metrics
     else:
         logging.warning(f"❗ 無法取得 alpha_id={alpha_id} 的績效資料")
         return {
@@ -137,12 +135,14 @@ for expr in alpha_expressions:
 
     # 查詢詳細績效
     metrics = fetch_alpha_metrics(session, alpha_id)
-    sharpe = metrics["sharpe"]
-    turnover = metrics["turnover"]
-    fitness = metrics["fitness"]
+    sharpe = metrics.get("sharpe")
+    turnover = metrics.get("turnover")
+    fitness = metrics.get("fitness")
 
     if sharpe is not None and turnover is not None and fitness is not None:
         logging.info(f"📊 Sharpe: {sharpe:.2f}, Turnover: {turnover:.2f}, Fitness: {fitness:.2f}")
+        logging.info(f"📈 Returns: {metrics.get('returns')}%, Drawdown: {metrics.get('drawdown')}%, Margin: {metrics.get('margin')}‱")
+
         metrics["expression"] = expr
         if sharpe > 1.25 and 0.01 < turnover < 0.7 and fitness > 1.0:
             logging.info("✅ 此 alpha 通過條件，將提交")
@@ -163,6 +163,15 @@ for expr in alpha_expressions:
     results_log.append(metrics)
 
 # 儲存所有模擬結果
+if os.path.exists("results.json") and os.path.getsize("results.json") > 0:
+    with open("results.json") as f:
+        existing = json.load(f)
+else:
+    existing = []
+
+existing.extend(results_log)
+
 with open("results.json", "w") as f:
-    json.dump(results_log, f, indent=2, ensure_ascii=False)
+    json.dump(existing, f, indent=2, ensure_ascii=False)
+
 logging.info("✅ 所有模擬結果已寫入 results.json")

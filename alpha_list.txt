@@ -1,10 +1,1 @@
-rank(income / cap)
-rank(bookvalue_ps / close)
-rank(close / ts_delay(close, 252))
-rank((close / ts_delay(close, 252)) - group_mean(close / ts_delay(close, 252), industry))
-rank(return_equity)
-rank(close / ts_mean(close, 60))
-rank(anl4_epsr_value / anl4_epsr_mean - 1)
-rank(pcr_vol_all)
-(rank(income / cap) + rank(close / ts_delay(close, 252))) / 2
-rank(ts_sum(returns, 252) / ts_stddev(returns, 252))
+rank(-ts_zscore(enterprise_value / ebitda, 63))
