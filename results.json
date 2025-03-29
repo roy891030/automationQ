@@ -1,23 +1,106 @@
 [
   {
-    "sharpe": -1.32,
-    "turnover": 0.4004,
-    "fitness": -0.67,
+    "sharpe": 0.25,
+    "turnover": 0.0371,
+    "fitness": 0.12,
     "status": "fail",
-    "expression": "rank(ts_delta(close, 5))"
+    "expression": "rank(income / cap)"
   },
   {
-    "sharpe": -0.14,
-    "turnover": 0.6291,
-    "fitness": -0.01,
-    "status": "fail",
-    "expression": "-ts_rank(volume, 10)"
+    "expression": "rank(bookvalue_ps / close)",
+    "status": "timeout"
   },
   {
-    "sharpe": -1.07,
-    "turnover": 0.507,
-    "fitness": -0.62,
+    "sharpe": -0.11,
+    "turnover": 0.0797,
+    "fitness": -0.04,
     "status": "fail",
-    "expression": "log(divide(close, ts_mean(close, 5)))"
+    "expression": "rank(close / ts_delay(close, 252))"
+  },
+  {
+    "expression": "rank((close / ts_delay(close, 252)) - group_mean(close / ts_delay(close, 252), industry))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(return_equity)",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(close / ts_mean(close, 60))",
+    "status": "timeout"
+  },
+  {
+    "sharpe": 0.0,
+    "turnover": 0.0367,
+    "fitness": 0.0,
+    "status": "fail",
+    "expression": "rank(anl4_epsr_value / anl4_epsr_mean - 1)"
+  },
+  {
+    "expression": "rank(pcr_vol_all)",
+    "status": "timeout"
+  },
+  {
+    "sharpe": -0.06,
+    "turnover": 0.0671,
+    "fitness": -0.02,
+    "status": "fail",
+    "expression": "(rank(income / cap) + rank(close / ts_delay(close, 252))) / 2"
+  },
+  {
+    "expression": "rank(ts_sum(returns, 252) / ts_stddev(returns, 252))",
+    "status": "timeout"
+  },
+  {
+    "sharpe": 0.31,
+    "turnover": 0.0341,
+    "fitness": 0.15,
+    "status": "fail",
+    "expression": "rank(income / cap)"
+  },
+  {
+    "expression": "rank(bookvalue_ps / close)",
+    "status": "timeout"
+  },
+  {
+    "sharpe": -0.11,
+    "turnover": 0.0797,
+    "fitness": -0.04,
+    "status": "fail",
+    "expression": "rank(close / ts_delay(close, 252))"
+  },
+  {
+    "expression": "rank((close / ts_delay(close, 252)) - group_mean(close / ts_delay(close, 252), industry))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(return_equity)",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(close / ts_mean(close, 60))",
+    "status": "timeout"
+  },
+  {
+    "sharpe": 0.0,
+    "turnover": 0.0367,
+    "fitness": 0.0,
+    "status": "fail",
+    "expression": "rank(anl4_epsr_value / anl4_epsr_mean - 1)"
+  },
+  {
+    "expression": "rank(pcr_vol_all)",
+    "status": "timeout"
+  },
+  {
+    "sharpe": -0.06,
+    "turnover": 0.0671,
+    "fitness": -0.02,
+    "status": "fail",
+    "expression": "(rank(income / cap) + rank(close / ts_delay(close, 252))) / 2"
+  },
+  {
+    "expression": "rank(ts_sum(returns, 252) / ts_stddev(returns, 252))",
+    "status": "timeout"
   }
 ]

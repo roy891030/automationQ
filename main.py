@@ -29,9 +29,17 @@ if not os.path.exists('alpha_list.txt'):
 with open('alpha_list.txt') as f:
     alpha_expressions = [line.strip() for line in f if line.strip()]
 
-results_log = []
+# 載入舊的 results.json（如果有的話）
+if os.path.exists("results.json"):
+    with open("results.json", "r") as f:
+        try:
+            results_log = json.load(f)
+        except json.JSONDecodeError:
+            results_log = []
+else:
+    results_log = []
 
-# 等待 alpha_id 出現
+# 等待 alpha_id 出現，若系統標記為錯誤就提早跳過
 def wait_for_alpha_id(session, expr, max_wait=60, check_interval=5):
     waited = 0
     while waited < max_wait:
@@ -40,6 +48,13 @@ def wait_for_alpha_id(session, expr, max_wait=60, check_interval=5):
             alphas = resp.json().get("results", [])
             for entry in alphas:
                 if entry.get("regular", {}).get("code") == expr:
+                    if entry.get("status") == "ERROR":
+                        logging.warning("❌ 模擬已建立，但系統標記此 alpha 為錯誤，跳過")
+                        results_log.append({
+                            "expression": expr,
+                            "status": "simulation_status_error"
+                        })
+                        return None
                     return entry.get("id")
         time.sleep(check_interval)
         waited += check_interval
@@ -47,6 +62,7 @@ def wait_for_alpha_id(session, expr, max_wait=60, check_interval=5):
     logging.warning("⌛ 超過等待時間，未取得 alpha_id")
     results_log.append({"expression": expr, "status": "timeout"})
     return None
+
 
 # 用 alpha_id 查詢最新績效
 def fetch_alpha_metrics(session, alpha_id):
