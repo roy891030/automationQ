@@ -1,1 +1,1 @@
-rank(-ts_scale(divide(enterprise_value, ebitda), 63))
+rank(-signed_power(ts_zscore(divide(enterprise_value, ebitda), 63), 2))

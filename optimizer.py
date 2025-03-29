@@ -30,26 +30,28 @@ with open('tune_alpha_list.txt') as f:
 # 登入
 session = requests.Session()
 session.auth = HTTPBasicAuth(username, password)
-resp = session.post('https://api.worldquantbrain.com/authentication')
-if resp.status_code != 201:
+auth_resp = session.post('https://api.worldquantbrain.com/authentication')
+if auth_resp.status_code != 201:
     logging.error("登入失敗")
     exit(1)
 
-# 函式：模擬 alpha 並回傳績效
-def simulate_alpha(expr, settings):
+# 等待 alpha_id 並回傳績效
+
+def simulate_and_evaluate(expr, settings):
     payload = {
         'type': 'REGULAR',
         'settings': settings,
         'regular': expr
     }
     try:
-        time.sleep(2)  # 避免頻繁請求觸發 rate limit
         r = session.post(SIMULATION_URL, json=payload)
         r.raise_for_status()
     except requests.exceptions.RequestException as e:
         logging.warning(f"模擬失敗: {e}")
         return None
 
+    # 等待 alpha_id
+    logging.info("⌛ 等待 alpha_id 出現...")
     waited = 0
     while waited < 60:
         resp = session.get(ALPHAS_URL)
@@ -60,29 +62,34 @@ def simulate_alpha(expr, settings):
                     if entry.get("status") == "ERROR":
                         return None
                     alpha_id = entry.get("id")
-                    detail_resp = session.get(ALPHA_DETAIL_URL.format(alpha_id))
-                    if detail_resp.status_code == 200:
-                        data = detail_resp.json().get("is", {})
+                    detail = session.get(ALPHA_DETAIL_URL.format(alpha_id))
+                    if detail.status_code == 200:
+                        data = detail.json().get("is", {})
+                        sharpe = data.get("sharpe")
+                        fitness = data.get("fitness")
+                        turnover = data.get("turnover")
+                        logging.info(f"📊 Sharpe: {sharpe:.2f}, Fitness: {fitness:.2f}, Turnover: {turnover:.2f}")
                         return {
                             'expression': expr,
                             'alpha_id': alpha_id,
-                            'sharpe': data.get("sharpe"),
-                            'turnover': data.get("turnover"),
-                            'fitness': data.get("fitness"),
+                            'sharpe': sharpe,
+                            'turnover': turnover,
+                            'fitness': fitness,
                             'settings': settings
                         }
         time.sleep(5)
         waited += 5
     return None
 
-# 搜集所有結果
+# 儲存候選結果
 candidate_results = []
 
-# 嘗試所有參數組合
+# 執行每組 alpha
 for expr in alpha_expressions:
-    logging.info(f"🔍 最佳化 alpha: {expr}")
-    for universe, decay, neutral, trunc in itertools.product(UNIVERSE_LIST, DECAY_LIST, NEUTRALIZATION_LIST, TRUNCATION_LIST):
-        logging.info(f"🧪 測試組合: universe={universe}, decay={decay}, neutralization={neutral}, truncation={trunc}")
+    logging.info(f"🔍 測試 alpha: {expr}")
+
+    combinations = itertools.product(UNIVERSE_LIST, DECAY_LIST, NEUTRALIZATION_LIST, TRUNCATION_LIST)
+    for universe, decay, neutral, trunc in combinations:
         settings = {
             'instrumentType': 'EQUITY',
             'region': 'USA',
@@ -98,18 +105,23 @@ for expr in alpha_expressions:
             'visualization': False,
             'testPeriod': 'P1Y'
         }
-        result = simulate_alpha(expr, settings)
+
+        logging.info(f"🧪 組合: {settings}")
+        result = simulate_and_evaluate(expr, settings)
+
         if result and result['sharpe'] and result['fitness'] and result['turnover']:
-            sharpe = result['sharpe']
-            fitness = result['fitness']
-            turnover = result['turnover']
-            if sharpe > 1.25 and 0.01 < turnover < 0.7 and fitness > 1.0:
-                logging.info(f"✅ 符合條件！Sharpe: {sharpe}, Fitness: {fitness}, Turnover: {turnover}")
+            s, f, t = result['sharpe'], result['fitness'], result['turnover']
+            if s > 1.25 and 0.01 < t < 0.7 and f > 1.0:
                 result['status'] = 'candidate'
                 result['source'] = 'optimizer'
                 candidate_results.append(result)
+                logging.info("✅ 加入 candidate.json")
+            else:
+                logging.info("❌ 未通過篩選條件")
+        else:
+            logging.warning("⚠️ 無法取得完整績效資料")
 
-# 寫入 candidate.json
+# 寫入檔案
 if candidate_results:
     if os.path.exists("candidate.json") and os.path.getsize("candidate.json") > 0:
         with open("candidate.json") as f:
