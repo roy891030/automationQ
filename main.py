@@ -135,6 +135,7 @@ for expr in alpha_expressions:
 
     # 查詢詳細績效
     metrics = fetch_alpha_metrics(session, alpha_id)
+    metrics["expression"] = expr
     sharpe = metrics.get("sharpe")
     turnover = metrics.get("turnover")
     fitness = metrics.get("fitness")
@@ -143,24 +144,46 @@ for expr in alpha_expressions:
         logging.info(f"📊 Sharpe: {sharpe:.2f}, Turnover: {turnover:.2f}, Fitness: {fitness:.2f}")
         logging.info(f"📈 Returns: {metrics.get('returns')}%, Drawdown: {metrics.get('drawdown')}%, Margin: {metrics.get('margin')}‱")
 
-        metrics["expression"] = expr
+# 不要自動提交Apha
+#        if sharpe > 1.25 and 0.01 < turnover < 0.7 and fitness > 1.0:
+#            logging.info("✅ 此 alpha 通過條件，將提交")
+#            metrics["status"] = "pass"
+#            submit_resp = session.post(SUBMIT_URL.format(alpha_id))
+#            if submit_resp.status_code == 200:
+#                logging.info(f"📩 已成功提交 alpha_id={alpha_id}")
+#            else:
+#                logging.warning(f"❗ 提交失敗：{submit_resp.status_code}")
+#        else:
+#            metrics["status"] = "fail"
+#            logging.info("❌ 此 alpha 未通過條件")
         if sharpe > 1.25 and 0.01 < turnover < 0.7 and fitness > 1.0:
-            logging.info("✅ 此 alpha 通過條件，將提交")
-            metrics["status"] = "pass"
-            submit_resp = session.post(SUBMIT_URL.format(alpha_id))
-            if submit_resp.status_code == 200:
-                logging.info(f"📩 已成功提交 alpha_id={alpha_id}")
-            else:
-                logging.warning(f"❗ 提交失敗：{submit_resp.status_code}")
+            logging.info("✅ 此 alpha 通過條件，請手動評估是否提交")
+            metrics["status"] = "candidate"
         else:
             metrics["status"] = "fail"
             logging.info("❌ 此 alpha 未通過條件")
+
     else:
         logging.warning("⚠️ 無法取得完整績效資料")
         metrics["expression"] = expr
         metrics["status"] = "no_data"
 
     results_log.append(metrics)
+
+# 若為 candidate，另外寫入 candidate.json
+if metrics.get("status") == "candidate":
+    if os.path.exists("candidate.json") and os.path.getsize("candidate.json") > 0:
+        with open("candidate.json") as f:
+            candidate_list = json.load(f)
+    else:
+        candidate_list = []
+
+    candidate_list.append(metrics)
+
+    with open("candidate.json", "w") as f:
+        json.dump(candidate_list, f, indent=2, ensure_ascii=False)
+
+    logging.info("📝 已新增至 candidate.json")
 
 # 儲存所有模擬結果
 if os.path.exists("results.json") and os.path.getsize("results.json") > 0:

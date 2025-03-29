@@ -24,5 +24,16 @@
   {
     "expression": "rank(-ts_zscore(enterprise_value / ebitda, 63))",
     "status": "timeout"
+  },
+  {
+    "sharpe": 1.09,
+    "turnover": 0.1492,
+    "fitness": 0.72,
+    "returns": 0.065,
+    "drawdown": 0.0926,
+    "margin": 0.000871,
+    "alpha_id": "8v8wmLv",
+    "status": "fail",
+    "expression": "rank(-ts_zscore(enterprise_value / ebitda, 63))"
   }
 ]
