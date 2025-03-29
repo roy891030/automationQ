@@ -1,0 +1,1 @@
+rank(-ts_scale(divide(enterprise_value, ebitda), 63))

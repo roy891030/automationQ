@@ -35,5 +35,404 @@
     "alpha_id": "8v8wmLv",
     "status": "fail",
     "expression": "rank(-ts_zscore(enterprise_value / ebitda, 63))"
+  },
+  {
+    "sharpe": 1.33,
+    "turnover": 0.2344,
+    "fitness": 0.82,
+    "returns": 0.0897,
+    "drawdown": 0.0987,
+    "margin": 0.000766,
+    "alpha_id": "NexXkeg",
+    "status": "fail",
+    "expression": "group_neutralize(rank(-ts_zscore(divide(enterprise_value, ebitda), 63)), industry)"
+  },
+  {
+    "sharpe": 1.13,
+    "turnover": 0.2046,
+    "fitness": 0.69,
+    "returns": 0.0768,
+    "drawdown": 0.1085,
+    "margin": 0.000751,
+    "alpha_id": "EVOZYN9",
+    "status": "fail",
+    "expression": "rank(-add(ts_zscore(divide(enterprise_value, ebitda), 63), ts_zscore(divide(enterprise_value, ebitda), 126)))"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(enterprise_value, ebitda), 63))",
+    "status": "timeout"
+  },
+  {
+    "sharpe": 1.33,
+    "turnover": 0.2344,
+    "fitness": 0.82,
+    "returns": 0.0897,
+    "drawdown": 0.0987,
+    "margin": 0.000766,
+    "alpha_id": "NexXkeg",
+    "status": "fail",
+    "expression": "group_neutralize(rank(-ts_zscore(divide(enterprise_value, ebitda), 63)), industry)"
+  },
+  {
+    "sharpe": 0.91,
+    "turnover": 0.163,
+    "fitness": 0.56,
+    "returns": 0.0608,
+    "drawdown": 0.1132,
+    "margin": 0.000746,
+    "alpha_id": "3jQqrYQ",
+    "status": "fail",
+    "expression": "rank(-ts_zscore(divide(enterprise_value, ebitda), 126))"
+  },
+  {
+    "sharpe": -0.42,
+    "turnover": 0.0127,
+    "fitness": -0.24,
+    "returns": -0.0425,
+    "drawdown": 0.4705,
+    "margin": -0.006693,
+    "alpha_id": "8v581po",
+    "status": "fail",
+    "expression": "rank(-ts_mean(divide(enterprise_value, ebitda), 63))"
+  },
+  {
+    "sharpe": 0.4,
+    "turnover": 0.0438,
+    "fitness": 0.23,
+    "returns": 0.0413,
+    "drawdown": 0.2384,
+    "margin": 0.001888,
+    "alpha_id": "1jkYvKW",
+    "status": "fail",
+    "expression": "rank(-log(divide(enterprise_value, ebitda)))"
+  },
+  {
+    "sharpe": 1.45,
+    "turnover": 0.2635,
+    "fitness": 0.88,
+    "returns": 0.0971,
+    "drawdown": 0.0954,
+    "margin": 0.000737,
+    "alpha_id": "3jQqY1Z",
+    "status": "fail",
+    "expression": "rank(-ts_scale(divide(enterprise_value, ebitda), 63))"
+  },
+  {
+    "expression": "rank(-divide(ts_zscore(enterprise_value, 63), ts_zscore(ebitda, 63)))",
+    "status": "timeout"
+  },
+  {
+    "sharpe": 0.28,
+    "turnover": 0.0381,
+    "fitness": 0.15,
+    "returns": 0.0348,
+    "drawdown": 0.2945,
+    "margin": 0.001831,
+    "alpha_id": "lMpeV9l",
+    "status": "fail",
+    "expression": "rank(-ts_std_dev(divide(enterprise_value, ebitda), 63))"
+  },
+  {
+    "sharpe": -0.38,
+    "turnover": 0.0241,
+    "fitness": -0.21,
+    "returns": -0.0392,
+    "drawdown": 0.4783,
+    "margin": -0.003251,
+    "alpha_id": "0jOmplK",
+    "status": "fail",
+    "expression": "rank(-ts_decay_linear(divide(enterprise_value, ebitda), 63))"
+  },
+  {
+    "expression": "group_zscore(-divide(enterprise_value, ebitda), industry)",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(market_cap, net_income), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(price, book_value_per_share), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(price, sales_per_share), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(enterprise_value, ebit), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(enterprise_value, free_cash_flow), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "group_neutralize(rank(-ts_zscore(divide(price, net_income), 63)), industry)",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(price, operating_cash_flow), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(enterprise_value, revenue), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(enterprise_value, gross_profit), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-log(divide(price, net_income)))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-add(ts_zscore(divide(enterprise_value, ebitda), 63), ts_zscore(divide(price, book_value_per_share), 63)))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-subtract(ts_zscore(divide(enterprise_value, ebitda), 63), ts_zscore(divide(price, net_income), 63)))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_corr(divide(enterprise_value, ebitda), return_on_equity, 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(ts_zscore(multiply(return_on_equity, gross_margin), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(ts_zscore(add(return_on_equity, net_margin), 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(-ts_zscore(divide(price, return_on_equity), 63))",
+    "status": "simulation_error",
+    "error_message": "502 Server Error: Bad Gateway for url: https://api.worldquantbrain.com/simulations",
+    "details": "<html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body>\r\n<center><h1>502 Bad Gateway</h1></center>\r\n</body>\r\n</html>\r\n"
+  },
+  {
+    "sharpe": 1.33,
+    "turnover": 0.2344,
+    "fitness": 0.82,
+    "returns": 0.0897,
+    "drawdown": 0.0987,
+    "margin": 0.000766,
+    "alpha_id": "M0MOp2o",
+    "status": "fail",
+    "expression": "rank(-signed_power(ts_zscore(divide(enterprise_value, ebitda), 63), 2))"
+  },
+  {
+    "sharpe": -0.22,
+    "turnover": 0.4045,
+    "fitness": -0.04,
+    "returns": -0.0128,
+    "drawdown": 0.1684,
+    "margin": -6.3e-05,
+    "alpha_id": "1jkepJJ",
+    "status": "fail",
+    "expression": "rank(-power(ts_zscore(divide(enterprise_value, ebitda), 63), 2))"
+  },
+  {
+    "sharpe": 1.03,
+    "turnover": 0.2802,
+    "fitness": 0.48,
+    "returns": 0.0596,
+    "drawdown": 0.1053,
+    "margin": 0.000426,
+    "alpha_id": "kJEdojP",
+    "status": "fail",
+    "expression": "rank(-ts_delta(divide(enterprise_value, ebitda), 20))"
+  },
+  {
+    "sharpe": 1.06,
+    "turnover": 0.2237,
+    "fitness": 0.66,
+    "returns": 0.086,
+    "drawdown": 0.1276,
+    "margin": 0.000768,
+    "alpha_id": "0jOqYP1",
+    "status": "fail",
+    "expression": "rank(-ts_regression(enterprise_value, ebitda, 63))"
+  },
+  {
+    "sharpe": 1.22,
+    "turnover": 0.2937,
+    "fitness": 0.65,
+    "returns": 0.0824,
+    "drawdown": 0.1023,
+    "margin": 0.000561,
+    "alpha_id": "OJQORkq",
+    "status": "fail",
+    "expression": "rank(-ts_zscore(divide(enterprise_value, ebitda), 42))"
+  },
+  {
+    "sharpe": 1.14,
+    "turnover": 0.2011,
+    "fitness": 0.7,
+    "returns": 0.0758,
+    "drawdown": 0.1066,
+    "margin": 0.000753,
+    "alpha_id": "6Am70mJ",
+    "status": "fail",
+    "expression": "rank(-ts_zscore(divide(enterprise_value, ebitda), 84))"
+  },
+  {
+    "sharpe": 1.01,
+    "turnover": 0.7635,
+    "fitness": 0.3,
+    "returns": 0.0693,
+    "drawdown": 0.1159,
+    "margin": 0.000182,
+    "alpha_id": "7o7WlNL",
+    "status": "fail",
+    "expression": "rank(-ts_zscore(ts_delta(divide(enterprise_value, ebitda), 3), 30))"
+  },
+  {
+    "sharpe": -0.55,
+    "turnover": 0.0969,
+    "fitness": -0.36,
+    "returns": -0.0537,
+    "drawdown": 0.5256,
+    "margin": -0.001108,
+    "alpha_id": "pvYmkav",
+    "status": "fail",
+    "expression": "rank(-ts_corr(divide(enterprise_value, ebitda), close, 30))"
+  },
+  {
+    "sharpe": 1.05,
+    "turnover": 0.2134,
+    "fitness": 0.59,
+    "returns": 0.0674,
+    "drawdown": 0.0799,
+    "margin": 0.000631,
+    "alpha_id": "JPMq9bE",
+    "status": "fail",
+    "expression": "rank(multiply(rank(close), -ts_zscore(divide(enterprise_value, ebitda), 63)))"
+  },
+  {
+    "sharpe": 1.38,
+    "turnover": 0.586,
+    "fitness": 0.52,
+    "returns": 0.083,
+    "drawdown": 0.0797,
+    "margin": 0.000283,
+    "alpha_id": "AQjW1Nw",
+    "status": "fail",
+    "expression": "rank(multiply(ts_rank(volume, 10), -ts_zscore(divide(enterprise_value, ebitda), 63)))"
+  },
+  {
+    "sharpe": -0.08,
+    "turnover": 0.6036,
+    "fitness": -0.01,
+    "returns": -0.0051,
+    "drawdown": 0.2322,
+    "margin": -1.7e-05,
+    "alpha_id": "WL1qMlx",
+    "status": "fail",
+    "expression": "rank(multiply(ts_delta(close, 5), -ts_zscore(divide(enterprise_value, ebitda), 63)))"
+  },
+  {
+    "expression": "rank(subtract(ts_zscore(return_on_equity, 63), ts_zscore(divide(enterprise_value, ebitda), 63)))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(add(rank(ts_zscore(gross_margin, 30)), -rank(ts_zscore(divide(enterprise_value, ebitda), 63))))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(ts_decay_linear(-ts_zscore(divide(enterprise_value, ebitda), 63), 10))",
+    "status": "timeout"
+  },
+  {
+    "sharpe": -0.45,
+    "turnover": 0.0455,
+    "fitness": -0.27,
+    "returns": -0.0461,
+    "drawdown": 0.4625,
+    "margin": -0.002026,
+    "alpha_id": "OJQY9mv",
+    "status": "fail",
+    "expression": "rank(log(add(divide(enterprise_value, ebitda), 1)))"
+  },
+  {
+    "sharpe": 1.33,
+    "turnover": 0.2344,
+    "fitness": 0.82,
+    "returns": 0.0897,
+    "drawdown": 0.0987,
+    "margin": 0.000766,
+    "alpha_id": "QYZJ9wK",
+    "status": "fail",
+    "expression": "reverse(rank(ts_zscore(divide(enterprise_value, ebitda), 63)))"
+  },
+  {
+    "sharpe": -1.02,
+    "turnover": 0.2396,
+    "fitness": -0.64,
+    "returns": -0.0955,
+    "drawdown": 0.5048,
+    "margin": -0.000797,
+    "alpha_id": "dKkXOXE",
+    "status": "fail",
+    "expression": "rank(ts_zscore(abs(divide(enterprise_value, ebitda)), 63))"
+  },
+  {
+    "sharpe": -0.25,
+    "turnover": 0.0349,
+    "fitness": -0.11,
+    "returns": -0.0264,
+    "drawdown": 0.4548,
+    "margin": -0.001512,
+    "alpha_id": "EVO7R8G",
+    "status": "fail",
+    "expression": "rank(-zscore(divide(enterprise_value, ebitda)))"
+  },
+  {
+    "sharpe": -0.24,
+    "turnover": 0.0454,
+    "fitness": -0.1,
+    "returns": -0.0197,
+    "drawdown": 0.3057,
+    "margin": -0.000867,
+    "alpha_id": "Gg1amoo",
+    "status": "fail",
+    "expression": "group_rank(-zscore(divide(enterprise_value, ebitda)), industry)"
+  },
+  {
+    "expression": "group_neutralize(rank(-zscore(divide(enterprise_value, ebitda))), country)",
+    "status": "timeout"
+  },
+  {
+    "sharpe": 0.23,
+    "turnover": 0.0575,
+    "fitness": 0.12,
+    "returns": 0.0341,
+    "drawdown": 0.4713,
+    "margin": 0.001185,
+    "alpha_id": "lMpqPv8",
+    "status": "fail",
+    "expression": "rank(divide(divide(enterprise_value, ebitda), ts_std_dev(divide(enterprise_value, ebitda), 63)))"
+  },
+  {
+    "expression": "rank(ts_corr(divide(enterprise_value, ebitda), gross_margin, 63))",
+    "status": "timeout"
+  },
+  {
+    "expression": "rank(ts_std_dev(divide(price, net_income), 63))",
+    "status": "timeout"
+  },
+  {
+    "sharpe": -0.82,
+    "turnover": 0.197,
+    "fitness": -0.43,
+    "returns": -0.0553,
+    "drawdown": 0.3134,
+    "margin": -0.000561,
+    "alpha_id": "Vd1jJ5b",
+    "status": "fail",
+    "expression": "rank(ts_zscore(ts_mean(divide(enterprise_value, ebitda), 10), 20))"
   }
 ]

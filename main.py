@@ -172,6 +172,8 @@ for expr in alpha_expressions:
 
 # 若為 candidate，另外寫入 candidate.json
 if metrics.get("status") == "candidate":
+    metrics["source"] = "main"  # ✅ 加上來源標記
+
     if os.path.exists("candidate.json") and os.path.getsize("candidate.json") > 0:
         with open("candidate.json") as f:
             candidate_list = json.load(f)
@@ -184,6 +186,7 @@ if metrics.get("status") == "candidate":
         json.dump(candidate_list, f, indent=2, ensure_ascii=False)
 
     logging.info("📝 已新增至 candidate.json")
+
 
 # 儲存所有模擬結果
 if os.path.exists("results.json") and os.path.getsize("results.json") > 0:
