@@ -44,7 +44,7 @@
 
 ```json
 ["your_username", "your_password"]
-
+```
 
 請將 `your_username` 與 `your_password` 替換為您在 WorldQuant BRAIN 的帳號密碼。
 
@@ -52,11 +52,11 @@
 
 請在這個檔案內輸入您要測試的 Alpha 表達式，例如：
 
-
+```
 rank(ts_delta(close, 5))
 -ts_rank(volume, 10)
 log(divide(close, ts_mean(close, 5)))
-
+```
 
 ### 步驟三：執行主程式
 
@@ -64,7 +64,7 @@ log(divide(close, ts_mean(close, 5)))
 
 ```bash
 python main.py
-
+```
 
 系統將會：
 
@@ -78,4 +78,6 @@ python main.py
 - 若 `alpha_list.txt` 不存在，程式會自動產生範例內容並停止執行，請修改完畢後再重新執行。
 - 所有結果會存在 `results.json`，可自行分析或後續使用。
 - 若需要提交 Alpha（而非僅模擬），請進一步修改程式碼中是否啟用 submit 功能。
+```
+
 
