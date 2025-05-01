@@ -34,8 +34,6 @@
 
    ```bash
    pip install -r requirements.txt
-
-
 ### 步驟二：建立必要檔案
 
 #### credentials.txt
